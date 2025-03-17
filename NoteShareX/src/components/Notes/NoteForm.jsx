@@ -22,9 +22,27 @@ const NoteForm = ({ isEdit = false }) => {
     // Fetch course list for dropdown
     const fetchCourses = async () => {
       try {
-        const response = await fetch('/api/courses');
-        const data = await response.json();
-        setCourseOptions(data);
+        const response = await fetch('/api/notes/courses');
+        if (response.ok) {
+          const data = await response.json();
+          setCourseOptions(data);
+        } else {
+          console.error('Failed to fetch courses, using defaults');
+          // Use fallback default courses
+          setCourseOptions([
+            'Computer Science',
+            'Mathematics',
+            'Physics',
+            'Biology',
+            'Chemistry',
+            'Psychology',
+            'Economics',
+            'Business',
+            'Engineering',
+            'Literature',
+            'History'
+          ]);
+        }
       } catch (error) {
         console.error('Error fetching courses:', error);
         // Use fallback default courses
@@ -51,18 +69,23 @@ const NoteForm = ({ isEdit = false }) => {
       const fetchNote = async () => {
         try {
           setLoading(true);
+          console.log('Fetching note for editing, ID:', id);
+          
           const response = await fetch(`/api/notes/${id}`);
+          console.log('Edit note fetch response:', response.status);
           
           if (!response.ok) {
             throw new Error('Note not found or you do not have permission to edit it');
           }
           
           const noteData = await response.json();
+          console.log('Note data for editing:', noteData);
+          
           setFormData({
-            title: noteData.title,
-            course: noteData.course,
+            title: noteData.title || '',
+            course: noteData.course || '',
             topic: noteData.topic || '',
-            content: noteData.content
+            content: noteData.content || ''
           });
           setLoading(false);
         } catch (error) {
@@ -97,6 +120,9 @@ const NoteForm = ({ isEdit = false }) => {
     setError('');
     
     try {
+      console.log('Submitting form data:', formData);
+      console.log('isEdit:', isEdit, 'id:', id);
+      
       const url = isEdit ? `/api/notes/${id}` : '/api/notes';
       const method = isEdit ? 'PUT' : 'POST';
       
@@ -108,17 +134,40 @@ const NoteForm = ({ isEdit = false }) => {
         body: JSON.stringify(formData),
       });
 
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save note');
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        
+        let errorMessage = 'Failed to save note';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          // If parsing fails, use the default error message
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
+      // Parse response data
+      let data;
+      const responseText = await response.text();
+      try {
+        data = JSON.parse(responseText);
+        console.log('Success data:', data);
+      } catch (e) {
+        console.error('Error parsing JSON response:', e);
+        console.log('Raw response:', responseText);
+        data = { _id: id }; // Fallback for edit mode
+      }
+      
       setSuccessMessage(isEdit ? 'Note updated successfully!' : 'Note created successfully!');
       
       // Redirect after a short delay to show success message
       setTimeout(() => {
-        navigate(`/notes/${data._id}`);
+        navigate(`/notes/${data._id || id}`);
       }, 1500);
     } catch (error) {
       console.error('Error saving note:', error);
@@ -164,8 +213,8 @@ const NoteForm = ({ isEdit = false }) => {
           >
             <option value="">Select a course</option>
             {courseOptions.map((course, index) => (
-              <option key={index} value={typeof course === 'string' ? course : course.name}>
-                {typeof course === 'string' ? course : course.name}
+              <option key={index} value={typeof course === 'string' ? course : course}>
+                {typeof course === 'string' ? course : course}
               </option>
             ))}
           </select>

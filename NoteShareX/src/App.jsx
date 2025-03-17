@@ -110,8 +110,7 @@ function App() {
               } 
             />
             
-            <Route path="/notes/:id" element={<NoteDetail isLoggedIn={isLoggedIn} />} />
-            
+            {/* 具体的なルートを先に配置 */}
             <Route 
               path="/notes/new" 
               element={
@@ -133,6 +132,9 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            
+            {/* 動的パラメータを含むルートを後に配置 */}
+            <Route path="/notes/:id" element={<NoteDetail isLoggedIn={isLoggedIn} user={user} />} />
             
             <Route 
               path="/profile" 

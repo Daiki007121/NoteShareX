@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import './NoteDetail.css';
 
-const NoteDetail = ({ isLoggedIn }) => {
+const NoteDetail = ({ isLoggedIn, user }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [note, setNote] = useState(null);
@@ -15,20 +15,34 @@ const NoteDetail = ({ isLoggedIn }) => {
     const fetchNote = async () => {
       try {
         setLoading(true);
+        console.log('Fetching note with ID:', id);
+        
         const response = await fetch(`/api/notes/${id}`);
+        
+        console.log('Response status:', response.status);
         
         if (!response.ok) {
           throw new Error('Note not found');
         }
         
         const data = await response.json();
+        console.log('Received note data:', data);
+        
         setNote(data);
         
         // Check if this note is in user's favorites
         if (isLoggedIn) {
-          const favResponse = await fetch('/api/users/me/favorites');
-          const favData = await favResponse.json();
-          setIsFavorite(favData.favorites.includes(id));
+          try {
+            const favResponse = await fetch('/api/users/me/favorites');
+            if (favResponse.ok) {
+              const favData = await favResponse.json();
+              // Check if note ID is in favorites array
+              const favorites = Array.isArray(favData) ? favData : [];
+              setIsFavorite(favorites.some(fav => fav._id === id));
+            }
+          } catch (favError) {
+            console.error('Error checking favorites:', favError);
+          }
         }
         
         setLoading(false);
@@ -95,8 +109,15 @@ const NoteDetail = ({ isLoggedIn }) => {
   };
 
   const handleDelete = async () => {
-    if (!isLoggedIn || !note || note.author._id !== 'current-user-id') {
-      // Replace 'current-user-id' with actual authentication logic
+    if (!isLoggedIn || !note) {
+      setErrorMessage('You do not have permission to delete this note.');
+      return;
+    }
+
+    // Check if user is the author
+    const isAuthor = user && note.author && user._id === note.author._id;
+    
+    if (!isAuthor) {
       setErrorMessage('You do not have permission to delete this note.');
       return;
     }
@@ -139,7 +160,8 @@ const NoteDetail = ({ isLoggedIn }) => {
     return <div>Note not found</div>;
   }
 
-  const isAuthor = note.author._id === 'current-user-id'; // Replace with actual user ID check
+  // Check if current user is the author
+  const isAuthor = user && note.author && user._id === note.author._id;
 
   return (
     <div className="note-detail-container">
@@ -152,7 +174,7 @@ const NoteDetail = ({ isLoggedIn }) => {
           </div>
           <div className="note-detail-info">
             <span className="note-detail-author">
-              By: {note.author.username}
+              By: {note.author ? note.author.username : 'Unknown'}
             </span>
             <span className="note-detail-date">
               {new Date(note.createdAt).toLocaleDateString()}
@@ -205,7 +227,8 @@ const NoteDetail = ({ isLoggedIn }) => {
 };
 
 NoteDetail.propTypes = {
-  isLoggedIn: PropTypes.bool
+  isLoggedIn: PropTypes.bool,
+  user: PropTypes.object
 };
 
 export default NoteDetail;
