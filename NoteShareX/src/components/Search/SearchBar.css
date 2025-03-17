@@ -1,0 +1,118 @@
+.search-bar-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.search-input-group {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  min-width: 250px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  min-width: 150px;
+  color: #000; /* より濃い色に変更 */
+  background-color: #fff; /* 背景色を明示的に白に設定 */
+  font-weight: 500; /* 少し太字に設定 */
+}
+
+.search-input::placeholder {
+  color: #aaa; /* プレースホルダーは薄い色に */
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.course-filter {
+  min-width: 140px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  color: #000; /* より濃い色に変更 */
+  appearance: auto; /* ドロップダウン矢印を表示 */
+  font-weight: 500; /* 少し太字に設定 */
+}
+
+.course-filter option {
+  color: #000; /* オプションも濃い色に設定 */
+}
+
+.course-filter:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.search-button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.search-button,
+.clear-button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+}
+
+.search-button:hover {
+  background-color: #1669d3;
+}
+
+.clear-button {
+  background-color: white;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+.clear-button:hover {
+  background-color: #f5f5f5;
+}
+
+@media (max-width: 600px) {
+  .search-form {
+    flex-direction: column;
+  }
+  
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  .search-button-group {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .search-button,
+  .clear-button {
+    flex: 1;
+  }
+}
