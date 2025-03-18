@@ -63,6 +63,9 @@ const NoteDetail = ({ isLoggedIn, user }) => {
     }
 
     try {
+      // Add loading state
+      setLoading(true);
+      
       const response = await fetch(`/api/notes/${id}/upvote`, {
         method: 'POST',
         headers: {
@@ -70,15 +73,46 @@ const NoteDetail = ({ isLoggedIn, user }) => {
         },
       });
 
+      const responseData = await response.text();
+      console.log('Upvote response:', response.status, responseData);
+
       if (!response.ok) {
-        throw new Error('Failed to upvote');
+        let errorMessage = 'Failed to upvote';
+        try {
+          const errorData = JSON.parse(responseData);
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          // Ignore JSON parsing error
+        }
+        throw new Error(errorMessage);
       }
 
-      const updatedNote = await response.json();
-      setNote(updatedNote);
+      // Parse response as JSON if not empty
+      let updatedNote;
+      if (responseData) {
+        try {
+          updatedNote = JSON.parse(responseData);
+        } catch (e) {
+          console.error('Error parsing upvote response:', e);
+        }
+      }
+
+      // Update note data
+      if (updatedNote) {
+        setNote(updatedNote);
+      } else {
+        // Optimistically update if server doesn't return data
+        setNote(prev => ({
+          ...prev,
+          upvotes: (prev.upvotes || 0) + 1
+        }));
+      }
+      
     } catch (error) {
       console.error('Error upvoting note:', error);
-      setErrorMessage('Failed to upvote. You may have already upvoted this note.');
+      setErrorMessage(error.message || 'Failed to upvote. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 

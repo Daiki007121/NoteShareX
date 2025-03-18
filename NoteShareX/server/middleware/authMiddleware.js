@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import * as userModel from '../models/userModel.js';
+import { getDB, ObjectId } from '../config/db.js';
 
 // Middleware to protect routes
 export const protect = async (req, res, next) => {
@@ -19,16 +19,20 @@ export const protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
 
-    // Attach user to request object
-    const user = await userModel.findUserById(decoded.id);
+    // Check if user exists
+    const user = await getDB().collection('users').findOne({ 
+      _id: new ObjectId(decoded.id) 
+    });
     
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
     
+    // Attach user to request object
     req.user = { id: user._id.toString() };
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error);
     return res.status(401).json({ message: 'Not authorized, token failed' });
   }
 };

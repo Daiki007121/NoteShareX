@@ -1,18 +1,22 @@
-import * as userModel from '../models/userModel.js';
-import * as noteModel from '../models/noteModel.js';
+import { getDB, ObjectId } from '../config/db.js';
 
 // @desc    Get current user profile
 // @route   GET /api/users/me
 // @access  Private
 export const getCurrentUser = async (req, res, next) => {
   try {
-    const user = await userModel.findUserById(req.user.id);
+    const user = await getDB().collection('users').findOne({ 
+      _id: new ObjectId(req.user.id) 
+    });
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    res.status(200).json(userModel.getUserWithoutPassword(user));
+    // Remove password from response
+    const { password, ...userWithoutPassword } = user;
+    
+    res.status(200).json(userWithoutPassword);
   } catch (error) {
     next(error);
   }
@@ -23,16 +27,16 @@ export const getCurrentUser = async (req, res, next) => {
 // @access  Public
 export const getUserByUsername = async (req, res, next) => {
   try {
-    const user = await userModel.findUserByUsername(req.params.username);
+    const user = await getDB().collection('users').findOne(
+      { username: req.params.username },
+      { projection: { password: 0, email: 0 } }
+    );
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Remove sensitive data
-    const { password, email, ...userWithoutSensitiveData } = user;
-    
-    res.status(200).json(userWithoutSensitiveData);
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }
@@ -43,7 +47,10 @@ export const getUserByUsername = async (req, res, next) => {
 // @access  Private
 export const getCurrentUserNotes = async (req, res, next) => {
   try {
-    const notes = await noteModel.getNotesByAuthor(req.user.id);
+    const notes = await getDB().collection('notes')
+      .find({ author: new ObjectId(req.user.id) })
+      .sort({ createdAt: -1 })
+      .toArray();
     
     res.status(200).json(notes);
   } catch (error) {
@@ -56,13 +63,16 @@ export const getCurrentUserNotes = async (req, res, next) => {
 // @access  Public
 export const getUserNotesByUsername = async (req, res, next) => {
   try {
-    const user = await userModel.findUserByUsername(req.params.username);
+    const user = await getDB().collection('users').findOne({ username: req.params.username });
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    const notes = await noteModel.getNotesByAuthor(user._id);
+    const notes = await getDB().collection('notes')
+      .find({ author: user._id })
+      .sort({ createdAt: -1 })
+      .toArray();
     
     res.status(200).json(notes);
   } catch (error) {
@@ -75,9 +85,27 @@ export const getUserNotesByUsername = async (req, res, next) => {
 // @access  Private
 export const getCurrentUserFavorites = async (req, res, next) => {
   try {
-    const favorites = await userModel.getUserFavorites(req.user.id);
+    const user = await getDB().collection('users').findOne({ 
+      _id: new ObjectId(req.user.id) 
+    });
     
-    res.status(200).json(favorites);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Ensure favorites is an array
+    const favorites = Array.isArray(user.favorites) ? user.favorites : [];
+    
+    if (favorites.length === 0) {
+      return res.status(200).json([]);
+    }
+    
+    // Get the actual notes
+    const favoriteNotes = await getDB().collection('notes')
+      .find({ _id: { $in: favorites } })
+      .toArray();
+    
+    res.status(200).json(favoriteNotes);
   } catch (error) {
     next(error);
   }
@@ -90,21 +118,36 @@ export const addToFavorites = async (req, res, next) => {
   try {
     const noteId = req.params.noteId;
     
+    if (!ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: 'Invalid note ID format' });
+    }
+    
     // Check if note exists
-    const note = await noteModel.getNoteById(noteId);
+    const note = await getDB().collection('notes').findOne({ 
+      _id: new ObjectId(noteId) 
+    });
+    
     if (!note) {
       return res.status(404).json({ message: 'Note not found' });
     }
     
-    // Add to favorites
-    const result = await userModel.addToFavorites(req.user.id, noteId);
+    // Add to favorites if not already there
+    const result = await getDB().collection('users').updateOne(
+      { _id: new ObjectId(req.user.id) },
+      { $addToSet: { favorites: new ObjectId(noteId) } }
+    );
     
-    if (!result) {
-      return res.status(400).json({ message: 'Failed to add to favorites' });
+    if (result.modifiedCount === 0 && result.matchedCount === 1) {
+      return res.status(400).json({ message: 'Note already in favorites' });
+    }
+    
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
     }
     
     res.status(200).json({ message: 'Note added to favorites' });
   } catch (error) {
+    console.error('Error adding to favorites:', error);
     next(error);
   }
 };
@@ -116,15 +159,23 @@ export const removeFromFavorites = async (req, res, next) => {
   try {
     const noteId = req.params.noteId;
     
-    // Remove from favorites
-    const result = await userModel.removeFromFavorites(req.user.id, noteId);
+    if (!ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: 'Invalid note ID format' });
+    }
     
-    if (!result) {
-      return res.status(400).json({ message: 'Failed to remove from favorites' });
+    // Remove from favorites
+    const result = await getDB().collection('users').updateOne(
+      { _id: new ObjectId(req.user.id) },
+      { $pull: { favorites: new ObjectId(noteId) } }
+    );
+    
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
     }
     
     res.status(200).json({ message: 'Note removed from favorites' });
   } catch (error) {
+    console.error('Error removing from favorites:', error);
     next(error);
   }
 };

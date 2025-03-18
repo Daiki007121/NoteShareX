@@ -1,5 +1,13 @@
 import express from 'express';
-import * as noteController from '../controllers/noteController.js';
+import { 
+  getNotes,
+  getNoteById,
+  createNote,
+  updateNote,
+  deleteNote,
+  upvoteNote,
+  getCourses
+} from '../controllers/noteController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -7,20 +15,20 @@ const router = express.Router();
 // Get all notes (with filters) and create new note
 router
   .route('/')
-  .get(noteController.getNotes)
-  .post(protect, noteController.createNote);
+  .get(getNotes)
+  .post(protect, createNote);
 
 // Get courses list for filtering
-router.get('/courses', noteController.getCourses);
+router.get('/courses', getCourses);
 
 // Get, update, and delete note by ID
 router
   .route('/:id')
-  .get(noteController.getNoteById)
-  .put(protect, noteController.updateNote)
-  .delete(protect, noteController.deleteNote);
+  .get(getNoteById)
+  .put(protect, updateNote)
+  .delete(protect, deleteNote);
 
 // Upvote a note
-router.post('/:id/upvote', protect, noteController.upvoteNote);
+router.post('/:id/upvote', protect, upvoteNote);
 
 export default router;
