@@ -220,7 +220,10 @@ export const upvoteNote = async (req, res, next) => {
       return res.status(404).json({ message: 'Note not found' });
     }
     
-    // Handle case where author field might be string or ObjectId
+    console.log('Note found:', note._id.toString());
+    console.log('Note author:', note.author);
+    
+    // Convert author to consistent ObjectId format for comparison
     let authorId;
     if (typeof note.author === 'string') {
       authorId = note.author;
@@ -230,27 +233,34 @@ export const upvoteNote = async (req, res, next) => {
       authorId = note.author._id.toString();
     }
     
+    console.log('Author ID for comparison:', authorId);
+    console.log('Current user ID:', req.user.id);
+    
     // Prevent authors from upvoting their own notes
     if (authorId === req.user.id) {
       return res.status(400).json({ message: 'You cannot upvote your own note' });
     }
     
-    // Initialize upvotedBy array if it doesn't exist
-    if (!note.upvotedBy) {
+    // Make sure upvotedBy is an array
+    if (!Array.isArray(note.upvotedBy)) {
+      console.log('upvotedBy is not an array, initializing empty array');
+      // Initialize upvotedBy array if it doesn't exist
       await getDB().collection('notes').updateOne(
         { _id: noteId },
         { $set: { upvotedBy: [] } }
       );
+      note.upvotedBy = [];
     }
     
     // Check if user has already upvoted
-    const upvotedBy = Array.isArray(note.upvotedBy) ? note.upvotedBy : [];
-    
-    const hasUpvoted = upvotedBy.some(id => {
+    const hasUpvoted = note.upvotedBy && note.upvotedBy.some(id => {
+      console.log('Comparing upvote ID:', id, 'with current user ID:', req.user.id);
       if (typeof id === 'string') {
         return id === req.user.id;
       } else if (id instanceof ObjectId) {
         return id.toString() === req.user.id;
+      } else if (id && id._id) {
+        return id._id.toString() === req.user.id;
       }
       return false;
     });
@@ -258,6 +268,8 @@ export const upvoteNote = async (req, res, next) => {
     if (hasUpvoted) {
       return res.status(400).json({ message: 'You have already upvoted this note' });
     }
+    
+    console.log('Adding upvote, user has not upvoted this note yet');
     
     // Add upvote
     const result = await getDB().collection('notes').findOneAndUpdate(
@@ -269,15 +281,19 @@ export const upvoteNote = async (req, res, next) => {
       { returnDocument: 'after' }
     );
     
+    console.log('Update result:', result);
+    
     if (!result.value) {
       return res.status(500).json({ message: 'Failed to upvote note' });
     }
     
     // Return updated note
+    console.log('Successfully upvoted note');
     res.status(200).json(result.value);
   } catch (error) {
-    console.error('Upvote error:', error);
-    next(error);
+    console.error('Upvote error details:', error.message);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ message: 'Failed to upvote note: ' + error.message });
   }
 };
 

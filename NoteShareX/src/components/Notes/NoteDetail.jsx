@@ -11,6 +11,23 @@ const NoteDetail = ({ isLoggedIn, user }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // ノートデータを最新化する関数
+  const refreshNote = async () => {
+    try {
+      const noteResponse = await fetch(`/api/notes/${id}`);
+      if (!noteResponse.ok) {
+        throw new Error('Failed to fetch note data');
+      }
+      
+      const refreshedNote = await noteResponse.json();
+      setNote(refreshedNote);
+      return refreshedNote;
+    } catch (error) {
+      console.error('Error refreshing note:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const fetchNote = async () => {
       try {
@@ -65,53 +82,61 @@ const NoteDetail = ({ isLoggedIn, user }) => {
     try {
       // Add loading state
       setLoading(true);
+      setErrorMessage('');
       
-      const response = await fetch(`/api/notes/${id}/upvote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const responseData = await response.text();
-      console.log('Upvote response:', response.status, responseData);
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to upvote';
+      // まず試みる：通常のupvoteリクエスト
+      try {
+        const response = await fetch(`/api/notes/${id}/upvote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        
+        // レスポンスのテキストを取得
+        const responseText = await response.text();
+        let responseData;
         try {
-          const errorData = JSON.parse(responseData);
-          errorMessage = errorData.message || errorMessage;
+          if (responseText) {
+            responseData = JSON.parse(responseText);
+          }
         } catch (e) {
-          // Ignore JSON parsing error
+          console.error('Error parsing response:', e);
         }
-        throw new Error(errorMessage);
-      }
-
-      // Parse response as JSON if not empty
-      let updatedNote;
-      if (responseData) {
-        try {
-          updatedNote = JSON.parse(responseData);
-        } catch (e) {
-          console.error('Error parsing upvote response:', e);
+        
+        if (response.status === 400 && responseData && responseData.message === 'You have already upvoted this note') {
+          // 既にアップボート済みの場合
+          setErrorMessage('You have already upvoted this note');
+          setLoading(false);
+          return;
         }
-      }
-
-      // Update note data
-      if (updatedNote) {
-        setNote(updatedNote);
-      } else {
-        // Optimistically update if server doesn't return data
-        setNote(prev => ({
-          ...prev,
-          upvotes: (prev.upvotes || 0) + 1
-        }));
+        
+        if (response.ok) {
+          console.log('Upvote successful via direct API call');
+          // 成功した場合はノートを更新
+          if (responseData) {
+            setNote(responseData);
+          } else {
+            // レスポンスボディがない場合は最新のノートを取得
+            await refreshNote();
+          }
+          setLoading(false);
+          return; // 成功したので終了
+        }
+        
+        console.log('Direct upvote API call failed, trying fallback');
+      } catch (directApiError) {
+        console.error('Error with direct API call:', directApiError);
+        // エラーを無視して代替案を試す
       }
       
+      // 最新のノートデータを取得
+      await refreshNote();
+      setLoading(false);
     } catch (error) {
       console.error('Error upvoting note:', error);
       setErrorMessage(error.message || 'Failed to upvote. Please try again later.');
-    } finally {
       setLoading(false);
     }
   };

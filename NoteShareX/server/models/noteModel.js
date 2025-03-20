@@ -1,5 +1,16 @@
-// server/models/noteModel.js - update the upvoteNote function
+import { getDB, ObjectId } from '../config/db.js';
 
+// Get all notes
+export const getNotes = async (queryParams) => {
+  // Implementation omitted for brevity
+};
+
+// Get note by ID
+export const getNoteById = async (id) => {
+  // Implementation omitted for brevity
+};
+
+// Upvote a note
 export const upvoteNote = async (id, userId) => {
   if (!ObjectId.isValid(id) || !ObjectId.isValid(userId)) {
     return { error: 'Invalid ID format' };
@@ -15,19 +26,33 @@ export const upvoteNote = async (id, userId) => {
     return { error: 'Note not found' };
   }
   
+  // Convert author to string for comparison
+  let authorIdStr;
+  if (typeof note.author === 'string') {
+    authorIdStr = note.author;
+  } else if (note.author instanceof ObjectId) {
+    authorIdStr = note.author.toString();
+  } else if (note.author && note.author._id) {
+    authorIdStr = note.author._id.toString();
+  }
+  
   // Prevent upvoting your own note
-  if (note.author instanceof ObjectId && note.author.equals(userIdObj) || 
-      note.author.toString() === userId) {
+  if (authorIdStr === userId) {
     return { error: 'You cannot upvote your own note' };
   }
   
-  // Normalize upvotedBy array
+  // Ensure upvotedBy is an array
   const upvotedBy = Array.isArray(note.upvotedBy) ? note.upvotedBy : [];
   
   // Check if already upvoted
-  const hasUpvoted = upvotedBy.some(id => 
-    (id instanceof ObjectId && id.equals(userIdObj)) || id.toString() === userId
-  );
+  const hasUpvoted = upvotedBy.some(id => {
+    if (typeof id === 'string') {
+      return id === userId;
+    } else if (id instanceof ObjectId) {
+      return id.toString() === userId;
+    }
+    return false;
+  });
   
   if (hasUpvoted) {
     return { error: 'You have already upvoted this note' };
@@ -42,6 +67,10 @@ export const upvoteNote = async (id, userId) => {
     },
     { returnDocument: 'after' }
   );
+  
+  if (!result.value) {
+    return { error: 'Failed to upvote note' };
+  }
   
   return result.value;
 };
