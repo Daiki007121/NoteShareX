@@ -20,8 +20,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Connect to MongoDB
-import { connectDB } from './config/db.js';
-connectDB();
+// Changed: Import getDB and ObjectId
+import { connectDB, getDB, ObjectId } from './config/db.js';
 
 // Middleware
 app.use(express.json());
@@ -32,6 +32,48 @@ app.use(cookieParser());
 app.use('/api/notes', noteRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+
+// Added: Database initialization function to ensure course data exists
+async function ensureBasicCourses() {
+  try {
+    const db = getDB();
+    const courses = await db.collection('notes').distinct('course');
+    
+    // If no courses exist, create sample notes with basic courses
+    if (!courses || courses.length === 0) {
+      const basicCourses = [
+        'Computer Science', 'Mathematics', 'Physics', 'Biology', 'Chemistry',
+        'Psychology', 'Economics', 'Business', 'Engineering', 'Literature', 'History',
+        'Philosophy', 'Sociology', 'Political Science', 'Art History'
+      ];
+      
+      console.log('No courses found. Adding basic courses...');
+      
+      // Create sample notes for each course
+      const notesToInsert = [];
+      for (const course of basicCourses) {
+        notesToInsert.push({
+          title: `Sample ${course} Note`,
+          content: `This is a sample note for ${course}.`,
+          course: course,
+          topic: 'Introduction',
+          author: new ObjectId(), // Random ID
+          upvotes: 0,
+          upvotedBy: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
+      await db.collection('notes').insertMany(notesToInsert);
+      console.log('Basic courses added successfully');
+    } else {
+      console.log('Courses already exist:', courses);
+    }
+  } catch (error) {
+    console.error('Error ensuring basic courses:', error);
+  }
+}
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
@@ -53,8 +95,19 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Set port and start server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Changed: Connect to database, initialize courses, then start server
+connectDB().then(async () => {
+  try {
+    // Initialize database with courses
+    await ensureBasicCourses();
+    
+    // Start server
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to initialize server:', error);
+    process.exit(1);
+  }
 });
