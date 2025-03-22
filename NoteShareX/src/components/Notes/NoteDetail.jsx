@@ -11,7 +11,7 @@ const NoteDetail = ({ isLoggedIn, user }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // ノートデータを最新化する関数
+  // Function to refresh note data
   const refreshNote = async () => {
     try {
       const noteResponse = await fetch(`/api/notes/${id}`);
@@ -84,7 +84,7 @@ const NoteDetail = ({ isLoggedIn, user }) => {
       setLoading(true);
       setErrorMessage('');
       
-      // まず試みる：通常のupvoteリクエスト
+      // First attempt: normal upvote request
       try {
         const response = await fetch(`/api/notes/${id}/upvote`, {
           method: 'POST',
@@ -94,7 +94,7 @@ const NoteDetail = ({ isLoggedIn, user }) => {
           credentials: 'include',
         });
         
-        // レスポンスのテキストを取得
+        // Get response text
         const responseText = await response.text();
         let responseData;
         try {
@@ -106,7 +106,7 @@ const NoteDetail = ({ isLoggedIn, user }) => {
         }
         
         if (response.status === 400 && responseData && responseData.message === 'You have already upvoted this note') {
-          // 既にアップボート済みの場合
+          // Already upvoted case
           setErrorMessage('You have already upvoted this note');
           setLoading(false);
           return;
@@ -114,24 +114,24 @@ const NoteDetail = ({ isLoggedIn, user }) => {
         
         if (response.ok) {
           console.log('Upvote successful via direct API call');
-          // 成功した場合はノートを更新
+          // Update note on success
           if (responseData) {
             setNote(responseData);
           } else {
-            // レスポンスボディがない場合は最新のノートを取得
+            // Fetch latest note data if no response body
             await refreshNote();
           }
           setLoading(false);
-          return; // 成功したので終了
+          return; // Exit on success
         }
         
         console.log('Direct upvote API call failed, trying fallback');
       } catch (directApiError) {
         console.error('Error with direct API call:', directApiError);
-        // エラーを無視して代替案を試す
+        // Ignore error and try alternative
       }
       
-      // 最新のノートデータを取得
+      // Get latest note data
       await refreshNote();
       setLoading(false);
     } catch (error) {
@@ -173,10 +173,17 @@ const NoteDetail = ({ isLoggedIn, user }) => {
       return;
     }
 
-    // Check if user is the author
-    const isAuthor = user && note.author && user._id === note.author._id;
+    // Test flag - allows deletion for testing CRUD (remove in production)
+    const showEditButtons = false;
     
-    if (!isAuthor) {
+    // Improved permission check that handles testing mode
+    const canDelete = showEditButtons || (user && note.author && (
+      (user._id === note.author._id) ||
+      (user._id?.toString() === note.author._id?.toString()) ||
+      (user._id?.toString() === note.author)
+    ));
+    
+    if (!canDelete) {
       setErrorMessage('You do not have permission to delete this note.');
       return;
     }
@@ -219,8 +226,26 @@ const NoteDetail = ({ isLoggedIn, user }) => {
     return <div>Note not found</div>;
   }
 
-  // Check if current user is the author
-  const isAuthor = user && note.author && user._id === note.author._id;
+  // Debug information
+  console.log('Current user:', user);
+  console.log('Note author:', note.author);
+  console.log('User ID:', user?._id);
+  console.log('Author ID:', note.author?._id);
+  
+  // Improved author check logic
+  const isAuthor = user && note.author && (
+    // Direct comparison
+    (user._id === note.author._id) ||
+    // String comparison
+    (user._id?.toString() === note.author._id?.toString()) ||
+    // If author is stored as string
+    (user._id?.toString() === note.author)
+  );
+  
+  console.log('Is author check result:', isAuthor);
+  
+  // Test flag - allows showing edit/delete buttons for testing CRUD (remove in production)
+  const showEditButtons = false;
 
   return (
     <div className="note-detail-container">
@@ -257,7 +282,8 @@ const NoteDetail = ({ isLoggedIn, user }) => {
         >
           {isFavorite ? '❤️ Favorited' : '🤍 Add to Favorites'}
         </button>
-        {isAuthor && (
+        {/* Modified: Show if isAuthor or showEditButtons is true */}
+        {(isAuthor || showEditButtons) && (
           <div className="author-actions">
             <Link to={`/notes/${id}/edit`} className="edit-note-button">
               Edit
