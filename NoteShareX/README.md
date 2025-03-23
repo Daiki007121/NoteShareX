@@ -16,6 +16,19 @@ The application is deployed at [https://notesharex-production.up.railway.app/](h
 ## Project Objective
 The objective of NoteShareX is to create a collaborative platform where students can share, discover, and upvote academic notes. The platform aims to improve study efficiency by centralizing high-quality study materials and fostering a community of knowledge sharing.
 
+## Screenshots
+![NoteShareX Home](screenshots/home.png)
+*Home screen of the application*
+
+![NoteShareX Browse Notes](screenshots/browse-notes.png)
+*Browse notes page showing various academic notes*
+
+![NoteShareX Note Detail](screenshots/detail-note.png)
+*Detailed view of a specific note with content and actions*
+
+![NoteShareX User Profile](screenshots/userprofile.png)
+*User profile page displaying user information and contributions*
+
 ## Features
 - User authentication system (register, login, logout)
 - Create, read, update, and delete notes
