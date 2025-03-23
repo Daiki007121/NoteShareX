@@ -1,8 +1,5 @@
 # NoteShareX Design Document
 
-## NoteShare URL 
-The application is deployed at [https://notesharex-production.up.railway.app/](https://notesharex-production.up.railway.app/)
-
 ## Project Description
 
 NoteShareX is an academic notes sharing platform designed to help students share and discover quality study materials. The platform allows users to create, browse, upvote, and favorite notes across various academic disciplines. 
@@ -10,7 +7,6 @@ NoteShareX is an academic notes sharing platform designed to help students share
 ## Overview
 
 NoteShare is a platform allowing students to share and discover academic notes. The platform enables users to upload notes organized by courses, search for study materials, and rate helpful content. This approach creates a collaborative ecosystem where students can both contribute and benefit from shared knowledge.
-
 
 ## User Personas
 
@@ -34,7 +30,6 @@ NoteShare is a platform allowing students to share and discover academic notes. 
 - **Goals:** Overcome language barriers through locally created notes that explain concepts in more accessible ways
 - **Pain Points:** Difficulty following lectures in non-native language, needs culturally relevant explanations of concepts
 - **Behaviors:** Actively seeks multiple explanations of complex topics, benefits from notes with visual elements, appreciates simplified language
-
 
 ## User Stories
 
@@ -82,7 +77,6 @@ NoteShare is a platform allowing students to share and discover academic notes. 
 ## Design Mockups
 
 ### Homepage
-![Homepage Mockup](https://i.imgur.com/ABC123.png)
 
 The homepage features:
 - Clean, intuitive navigation
@@ -91,7 +85,6 @@ The homepage features:
 - Quick access to create new notes (for logged-in users)
 
 ### Note Creation Page
-![Note Creation Mockup](https://i.imgur.com/DEF456.png)
 
 The note creation page includes:
 - Rich text editor for note content
@@ -99,7 +92,6 @@ The note creation page includes:
 - Save and publish options
 
 ### Note Detail Page
-![Note Detail Mockup](https://i.imgur.com/GHI789.png)
 
 The note detail page displays:
 - Full note content with proper formatting
@@ -108,7 +100,6 @@ The note detail page displays:
 - Related notes suggestions
 
 ### User Profile
-![User Profile Mockup](https://i.imgur.com/JKL012.png)
 
 The user profile includes:
 - User statistics (notes created, upvotes received)
