@@ -1,12 +1,16 @@
 # NoteShareX Design Document
 
+## NoteShare URL 
+The application is deployed at [https://notesharex-production.up.railway.app/](https://notesharex-production.up.railway.app/)
+
 ## Project Description
 
-NoteShareX is an academic notes sharing platform designed to help students share and discover quality study materials. The platform allows users to create, browse, upvote, and favorite notes across various academic disciplines. By centralizing high-quality academic content, NoteShareX aims to foster collaboration and improve study efficiency among students.
+NoteShareX is an academic notes sharing platform designed to help students share and discover quality study materials. The platform allows users to create, browse, upvote, and favorite notes across various academic disciplines. 
 
 ## Overview
 
 NoteShare is a platform allowing students to share and discover academic notes. The platform enables users to upload notes organized by courses, search for study materials, and rate helpful content. This approach creates a collaborative ecosystem where students can both contribute and benefit from shared knowledge.
+
 
 ## User Personas
 
@@ -31,12 +35,6 @@ NoteShare is a platform allowing students to share and discover academic notes. 
 - **Pain Points:** Difficulty following lectures in non-native language, needs culturally relevant explanations of concepts
 - **Behaviors:** Actively seeks multiple explanations of complex topics, benefits from notes with visual elements, appreciates simplified language
 
-### 4. Professor Jordan
-- **Age:** 45
-- **Occupation:** University professor teaching Economics
-- **Goals:** Provide additional resources to students, encourage collaborative learning
-- **Pain Points:** Students missing key concepts from lectures, uneven quality of circulating study materials
-- **Behaviors:** Encourages students to share knowledge, wants to promote quality content, occasionally browses platform to understand student needs
 
 ## User Stories
 
@@ -54,10 +52,6 @@ NoteShare is a platform allowing students to share and discover academic notes. 
 1. As an international student, I want to find notes created by local students so that I can understand concepts explained in more accessible language.
 2. As an international student, I want to contribute notes from my unique perspective so that I can help others with different viewpoints.
 3. As an international student, I want to search for notes in specific subjects where I struggle with terminology.
-
-### For Professor Jordan
-1. As a professor, I want to recommend quality student notes so that my class has access to good supplementary materials.
-2. As a professor, I want to browse notes related to my course so that I can understand what concepts students find important.
 
 ## Core Features
 
