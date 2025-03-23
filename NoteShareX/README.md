@@ -96,3 +96,4 @@ Test credentials:
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
+The MIT License is a permissive license that allows for reuse with few restrictions. It permits users to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software while providing attribution back to the original author.
