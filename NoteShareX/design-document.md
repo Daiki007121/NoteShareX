@@ -97,7 +97,7 @@ The browse notes page includes:
 - "Create Note" button for authenticated users
 
 ### Note Detail Page
-![Note Detail Mockup](screenshots/detail-note.png)
+![Note Detail Mockup](screenshots/notedetail2.png)
 
 The note detail page displays:
 - Full note content with clear formatting
