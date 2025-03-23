@@ -77,34 +77,44 @@ NoteShare is a platform allowing students to share and discover academic notes. 
 ## Design Mockups
 
 ### Homepage
+![Homepage Mockup](screenshots/home.png)
 
 The homepage features:
-- Clean, intuitive navigation
-- Search bar with filtering options
-- Grid view of popular/recent notes
-- Quick access to create new notes (for logged-in users)
+- Clean navigation bar at the top with NoteShare logo and authentication options
+- Hero section with welcome message and platform description
+- Search functionality with course filtering options
+- Grid view of recent and popular notes for easy discovery
+- Responsive design for optimal viewing on any device
 
-### Note Creation Page
+### Browse Notes Page
+![Browse Notes Mockup](screenshots/browse-notes.png)
 
-The note creation page includes:
-- Rich text editor for note content
-- Course and topic selection fields
-- Save and publish options
+The browse notes page includes:
+- Comprehensive search and filtering system
+- Sort options (most recent, highest rated)
+- Note cards displaying title, course, preview content, and rating
+- Clean grid layout optimized for scanning multiple notes quickly
+- "Create Note" button for authenticated users
 
 ### Note Detail Page
+![Note Detail Mockup](screenshots/detail-note.png)
 
 The note detail page displays:
-- Full note content with proper formatting
-- Author information
-- Upvote and favorite buttons
-- Related notes suggestions
+- Full note content with clear formatting
+- Metadata (author, course, creation date)
+- Interaction options (upvote, favorite)
+- Author-specific actions (edit, delete) when applicable
+- Navigation back to notes listing
 
 ### User Profile
+![User Profile Mockup](screenshots/userprofile.png)
 
 The user profile includes:
-- User statistics (notes created, upvotes received)
-- Tabs for created notes and favorites
-- Activity history
+- User identification and join date
+- Tabbed interface for created notes and favorites
+- Statistics dashboard showing contribution metrics
+- Note management interface for personal content
+- Responsive layout adapting to different screen sizes
 
 ## Technical Architecture
 
