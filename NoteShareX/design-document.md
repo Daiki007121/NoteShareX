@@ -77,6 +77,38 @@ NoteShare is a platform allowing students to share and discover academic notes. 
 ## Design Mockups
 
 ### Homepage
+
++----------------------------------------+
+|  NoteShareX                     Login  |
++----------------------------------------+
+|                                        |
+|    Welcome to NoteShareX              |
+|    Share and discover academic notes   |
+|                                        |
+| +--------+  +----------------------+   |
+| | Courses|  | Search notes...      |   |
+| +--------+  +----------------------+   |
+|                                        |
+| RECENT NOTES                           |
+|                                        |
+| +-------------+    +-------------+     |
+| | Math Notes  |    | CS Notes    |     |
+| | Course: Math|    | Course: CS  |     |
+| | ⭐ 42      |    | ⭐ 35       |     |
+| |             |    |             |     |
+| | View        |    | View        |     |
+| +-------------+    +-------------+     |
+|                                        |
+| +-------------+    +-------------+     |
+| | Bio Notes   |    | Econ Notes  |     |
+| | Course: Bio |    | Course: Econ|     |
+| | ⭐ 28      |    | ⭐ 19       |     |
+| |             |    |             |     |
+| | View        |    | View        |     |
+| +-------------+    +-------------+     |
+|                                        |
++----------------------------------------+
+
 ![Homepage Mockup](screenshots/home.png)
 
 The homepage features:
@@ -87,6 +119,39 @@ The homepage features:
 - Responsive design for optimal viewing on any device
 
 ### Browse Notes Page
+
++----------------------------------------+
+|  NoteShareX            Profile  Logout |
++----------------------------------------+
+|                                        |
+| +--------+  +----------------------+   |
+| | All    |  | Search notes...      |   |
+| | Courses|  +----------------------+   |
+| +--------+                             |
+|            +--------+  +------------+  |
+|            | Recent |  | Create Note|  |
+|            +--------+  +------------+  |
+|                                        |
+| +-------------+    +-------------+     |
+| | Statistics  |    | Algorithms  |     |
+| | CS          |    | CS          |     |
+| | Mar 15, 2025|    | Mar 12, 2025|     |
+| | ⭐ 42      |    | ⭐ 38       |     |
+| |             |    |             |     |
+| | View        |    | View        |     |
+| +-------------+    +-------------+     |
+|                                        |
+| +-------------+    +-------------+     |
+| | Calculus II |    | Cell Biology|     |
+| | Math        |    | Biology     |     |
+| | Mar 10, 2025|    | Mar 8, 2025 |     |
+| | ⭐ 35      |    | ⭐ 29       |     |
+| |             |    |             |     |
+| | View        |    | View        |     |
+| +-------------+    +-------------+     |
+|                                        |
++----------------------------------------+
+
 ![Browse Notes Mockup](screenshots/browse-notes.png)
 
 The browse notes page includes:
@@ -97,6 +162,41 @@ The browse notes page includes:
 - "Create Note" button for authenticated users
 
 ### Note Detail Page
+
++----------------------------------------+
+|  NoteShareX            Profile  Logout |
++----------------------------------------+
+|                                        |
+| < Back to Notes                        |
+|                                        |
+| +--------------------------------------+
+| | Data Structures & Algorithms         |
+| | Course: Computer Science             |
+| | Topic: Algorithms                    |
+| +--------------------------------------+
+|                                        |
+| By: Alex123  |  March 15, 2025         |
+|                                        |
+| +--------------------------------------+
+| |                                      |
+| | This note covers the fundamentals    |
+| | of data structures and algorithms.   |
+| |                                      |
+| | ## Arrays and Linked Lists           |
+| |                                      |
+| | Arrays offer constant-time access... |
+| | ...                                  |
+| | ...                                  |
+| |                                      |
+| | ## Sorting Algorithms                |
+| |                                      |
+| | ...                                  |
+| +--------------------------------------+
+|                                        |
+| [⭐ Upvote] (42)   [🤍 Add to Favorites]|
+|                                        |
++----------------------------------------+
+
 ![Note Detail Mockup](screenshots/notedetail2.png)
 
 The note detail page displays:
@@ -107,6 +207,45 @@ The note detail page displays:
 - Navigation back to notes listing
 
 ### User Profile
+
++----------------------------------------+
+|  NoteShareX            Profile  Logout |
++----------------------------------------+
+|                                        |
+| USER PROFILE                           |
+|                                        |
+| Username: Morgan42                     |
+| Member Since: February 12, 2025        |
+|                                        |
+| +-------------+  +------------------+  |
+| | Total Notes |  | Total Upvotes    |  |
+| |     12      |  |       247        |  |
+| +-------------+  +------------------+  |
+|                                        |
+| +--------+  +--------+                 |
+| | My Notes|  |Favorites|               |
+| +--------+  +--------+                 |
+|                                        |
+| +--------------------------------------+
+| | Algorithm Analysis                   |
+| | Course: Computer Science             |
+| | Created: March 15, 2025              |
+| | ⭐ 42                               |
+| |                                      |
+| | [Edit] [Delete]                      |
+| +--------------------------------------+
+|                                        |
+| +--------------------------------------+
+| | Linear Algebra Fundamentals          |
+| | Course: Mathematics                  |
+| | Created: March 10, 2025              |
+| | ⭐ 35                               |
+| |                                      |
+| | [Edit] [Delete]                      |
+| +--------------------------------------+
+|                                        |
++----------------------------------------+
+
 ![User Profile Mockup](screenshots/userprofile.png)
 
 The user profile includes:
